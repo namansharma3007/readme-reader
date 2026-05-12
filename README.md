@@ -222,12 +222,12 @@ CDN-loaded at runtime (no local install needed):
 
 ## Requirements
 
-- **Node.js** 16 or higher
-- **npm** 7 or higher
+- **Node.js** 20 or higher
+- **npm** 9 or higher
 - An internet connection on first load (for CDN fonts/highlight.js/KaTeX)
 
 ---
 
 ## License
 
-MIT © Your Name
+MIT © Naman Sharma
