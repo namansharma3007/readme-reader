@@ -14,13 +14,13 @@
   ],
   "author": "",
   "license": "MIT",
-  "homepage": "https://github.com/yourusername/readme-reader#readme",
+  "homepage": "https://github.com/namansharma3007/readme-reader#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/readme-reader.git"
+    "url": "git+https://github.com/namansharma3007/readme-reader.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/readme-reader/issues"
+    "url": "https://github.com/namansharma3007/readme-reader/issues"
   },
   "main": "bin/readme-reader.js",
   "bin": {
