@@ -686,30 +686,91 @@ const server = http.createServer((req, res) => {
   res.end(shell(buildTree(files), `<div class="md">${md.render(raw)}</div>`, filePath));
 });
 
+// ─── Terminal box printer ─────────────────────────────────────────────────
+
+/**
+ * Returns the visual/display width of a string in a terminal.
+ * Emoji and other "wide" Unicode characters occupy 2 columns
+ * but JS string methods count them as 1–2 code units, causing
+ * misalignment with hardcoded padding numbers.
+ */
+function visualWidth(str) {
+  let width = 0;
+  for (const char of str) {              // iterates by Unicode code point
+    const cp = char.codePointAt(0);
+    const isWide =
+      (cp >= 0x1100  && cp <= 0x115F)  || // Hangul Jamo
+      (cp >= 0x2E80  && cp <= 0x303E)  || // CJK Radicals / Kangxi
+      (cp >= 0x3041  && cp <= 0x33BF)  || // Japanese / Korean
+      (cp >= 0x33FF  && cp <= 0xA4C6)  || // CJK Unified
+      (cp >= 0xA960  && cp <= 0xA97C)  || // Hangul
+      (cp >= 0xAC00  && cp <= 0xD7A3)  || // Hangul Syllables
+      (cp >= 0xF900  && cp <= 0xFAFF)  || // CJK Compatibility
+      (cp >= 0xFE10  && cp <= 0xFE6F)  || // CJK Compatibility Forms
+      (cp >= 0xFF01  && cp <= 0xFF60)  || // Fullwidth Forms
+      (cp >= 0xFFE0  && cp <= 0xFFE6)  || // Fullwidth Signs
+      (cp >= 0x1B000 && cp <= 0x1B12F) || // Kana Supplement
+      (cp >= 0x1F000 && cp <= 0x1FFFF) || // Emoji / Mahjong / etc.
+      (cp >= 0x20000 && cp <= 0x3FFFD);   // CJK Extension B–F
+    width += isWide ? 2 : 1;
+  }
+  return width;
+}
+
+/**
+ * Pads `content` so the full row (borders included) is exactly
+ * (W + 4) columns: "│  " + content + padding + "  │"
+ */
+function row(content, W) {
+  const pad = Math.max(0, W - visualWidth(content));
+  return `│  ${content}${" ".repeat(pad)}  │`;
+}
+
+function printStartBanner(url, ROOT, WS_PORT) {
+  // Define all content lines first so W can be derived dynamically
+  const lines = [
+    ["header",  "📖  readme-reader  —  Local Markdown Viewer"],
+    ["divider"],
+    ["content", `🌐  URL    ${url}`],
+    ["content", `📁  Notes  ${ROOT}`],
+    ["content", `🔌  WS     ws://localhost:${WS_PORT}`],
+    ["divider"],
+    ["content", "save   →  content live-reload (scroll preserved)"],
+    ["content", "delete →  sidebar update + deleted banner"],
+    ["content", "create →  sidebar update"],
+    ["divider"],
+    ["content", "Press Ctrl+C to stop"],
+  ];
+
+  // Derive box width from the longest content line (+ 2 spaces on each side)
+  const W = lines.reduce((max, [type, text = ""]) =>
+    type === "content" ? Math.max(max, visualWidth(text)) : max, 0
+  );
+
+  const top     = `┌${"─".repeat(W + 4)}┐`;
+  const divider = `├${"─".repeat(W + 4)}┤`;
+  const bottom  = `└${"─".repeat(W + 4)}┘`;
+
+  const out = ["\n", top];
+  for (const [type, text = ""] of lines) {
+    if (type === "divider") out.push(divider);
+    else out.push(row(text, W));
+  }
+  out.push(bottom, "");
+
+  console.log(out.join("\n"));
+}
+
 // ─── Start ─────────────────────────────────────────────────────────────────
 server.listen(PORT, "127.0.0.1", () => {
   const url = `http://localhost:${PORT}`;
-  const W = 54;
-  const line = "─".repeat(W);
-  console.log(`\n┌${line}┐`);
-  console.log(`│  📖  readme-reader  —  Local Markdown Viewer` + " ".repeat(W - 37) + "│");
-  console.log(`├${line}┤`);
-  console.log(`│  🌐  URL      ${url}` + " ".repeat(W - 29) + "│");
-  console.log(`│  📁  Notes    ${ROOT}`.padEnd(W + 1) + "│");
-  console.log(`│  🔌  WS       ws://localhost:${WS_PORT}` + " ".repeat(W - 34) + "│");
-  console.log(`├${line}┤`);
-  console.log(`│  save   →  content live-reload (scroll preserved)  │`);
-  console.log(`│  delete →  sidebar update + deleted banner          │`);
-  console.log(`│  create →  sidebar update                           │`);
-  console.log(`├${line}┤`);
-  console.log(`│  Press Ctrl+C to stop` + " ".repeat(W - 21) + "│");
-  console.log(`└${line}┘\n`);
+  printStartBanner(url, ROOT, WS_PORT);
 
   if (!NO_OPEN) {
     const open =
       process.platform === "darwin" ? `open "${url}"` :
       process.platform === "win32"  ? `start "" "${url}"` :
-      `xdg-open "${url}" 2>/dev/null || sensible-browser "${url}"`;
-    exec(open, err => { if (err) console.log(`  👉  Open manually: ${url}\n`); });
+      `xdg-open "${url}"`;
+    exec(open);
   }
 });
