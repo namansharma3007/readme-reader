@@ -17,7 +17,7 @@
   "homepage": "https://github.com/yourusername/readme-reader#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/readme-reader.git"
+    "url": "git+https://github.com/yourusername/readme-reader.git"
   },
   "bugs": {
     "url": "https://github.com/yourusername/readme-reader/issues"
