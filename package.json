@@ -1,0 +1,47 @@
+{
+  "name": "readme-reader",
+  "version": "1.0.0",
+  "description": "A zero-config local Markdown viewer with live reload, dark/light mode, collapsible sidebar, and anchor-link navigation.",
+  "keywords": [
+    "markdown",
+    "viewer",
+    "readme",
+    "live-reload",
+    "documentation",
+    "notes",
+    "cli",
+    "dev-tool"
+  ],
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/yourusername/readme-reader#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/readme-reader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/readme-reader/issues"
+  },
+  "main": "bin/readme-reader.js",
+  "bin": {
+    "readme-reader": "bin/readme-reader.js"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "ws": "^8.17.1"
+  },
+  "scripts": {
+    "start": "node bin/readme-reader.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  }
+}
