@@ -1,198 +1,465 @@
-To thoroughly test your project's rendering capabilities, you need a README that covers everything from basic Markdown to GitHub Flavored Markdown (GFM) and HTML extensions.
+# readme-reader
 
-Below is a comprehensive "Stress Test" README. You can copy the raw code below into a file named `README.md`.
+> A zero-config, local Markdown viewer with live reload, dark/light mode, collapsible sidebar, PDF export, and working anchor-link navigation.
 
-***
-
-# 🚀 Comprehensive Markdown Rendering Test
-
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen) 
-![License](https://img.shields.io/badge/license-MIT-blue) 
-![Version](https://img.shields.io/badge/version-1.0.0-orange)
-
-This repository is designed to test the full range of rendering capabilities of a Markdown parser. If all elements below are rendered correctly, your project supports a wide array of **GitHub Flavored Markdown (GFM)** and standard Markdown features.
+![Node.js](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![npm](https://img.shields.io/badge/npm-publish%20ready-orange)
 
 ---
 
-## 📑 Table of Contents
-- [Text Formatting](#-text-formatting)
-- [Lists and Tasks](#-lists-and-tasks)
-- [Code Blocks](#-code-blocks)
-- [Tables](#-tables)
-- [Quotes and Alerts](#-quotes-and-alerts)
-- [Links and Images](#-links-and-images)
-- [Advanced HTML Components](#-advanced-html-components)
-- [Mathematics](#-mathematics)
-- [Footnotes](#-footnotes)
+## Features
+
+- **Live reload** — edits appear instantly, scroll position preserved
+- **File deletion detection** — sidebar updates automatically, deleted-file banner shown
+- **Anchor links** — all headings get slugified IDs; TOC links, footnote back-links, and footer references all work
+- **Dark / Light mode** — toggle persisted in `localStorage`
+- **Collapsible sidebar** — push-collapse on desktop, slide-over drawer on mobile
+- **Fully responsive** — works on all screen sizes
+- **PDF export** — one-click export of any note to a clean, print-ready PDF
+- **Math rendering** — KaTeX, wrap in `$...$` or `$$...$$`
+- **Task lists** — `- [ ]` / `- [x]` syntax
+- **Footnotes** — standard Markdown footnote syntax
+- **Syntax highlighting** — via highlight.js (auto language detection)
+- **Zero config** — one command, no setup
 
 ---
 
-## ✍️ Text Formatting
+## Quick Start
 
-Here is a demonstration of basic typography:
+### Use without installing (recommended for one-off use)
 
-- **Bold text** or __Bold text__
-- *Italic text* or _Italic text_
-- ***Bold and Italic*** or ___Bold and Italic___
-- ~~Strikethrough text~~
-- `Inline code` for small snippets.
-- Subscript: H~2~O (Supported by some parsers)
-- Superscript: X^2^ (Supported by some parsers)
-
----
-
-## 📜 Lists and Tasks
-
-### Unordered List
-* Item 1
-* Item 2
-  * Nested Item A
-  * Nested Item B
-    * Deeply Nested Item
-
-### Ordered List
-1. First item
-2. Second item
-   1. Sub-item 2.1
-   2. Sub-item 2.2
-3. Third item
-
-### Task List (Checkboxes)
-- [x] Completed task
-- [ ] Pending task
-- [ ] Task with ~~strikethrough~~ inside
-
----
-
-## 💻 Code Blocks
-
-### Syntax Highlighting (JavaScript)
-```javascript
-function greet(name) {
-  console.log(`Hello, ${name}!`);
-}
-greet('World');
-```
-
-### Syntax Highlighting (Python)
-```python
-def fibonacci(n):
-    a, b = 0, 1
-    while a < n:
-        print(a, end=' ')
-        a, b = b, a + b
-    print()
-```
-
-### Syntax Highlighting (Bash/Shell)
 ```bash
-mkdir test-folder
-cd test-folder
-touch index.html
-ls -la
+npx readme-reader
+```
+
+### Install globally
+
+```bash
+npm install -g readme-reader
+readme-reader
+```
+
+### Install locally in a project
+
+```bash
+npm install --save-dev readme-reader
+npx readme-reader
 ```
 
 ---
 
-## 📊 Tables
+## Usage
 
-| Feature | Status | Complexity | Notes |
-| :--- | :---: | :---: | :--- |
-| Headers | ✅ | Low | Standard alignment |
-| Center Align | ✅ | Low | Used for status |
-| Right Align | ✅ | Low | Used for complexity |
-| Multi-line | ❌ | High | Not native to MD |
+```
+readme-reader [directory] [options]
 
----
+Options:
+  --port <n>    HTTP port to listen on  (default: 3000)
+  --no-open     Don't auto-open the browser
+  --help, -h    Show this help message
 
-## 💬 Quotes and Alerts
-
-> This is a standard blockquote.
->
-> > This is a nested blockquote.
->
-> Back to the first level.
-
-***
-
-**Note:** Some renderers support "Alerts" or "Admonitions" using special syntax:
-> [!NOTE]
-> Useful information that users should know.
-
-> [!WARNING]
-> Critical information to prevent mistakes.
+Examples:
+  readme-reader                        # Serve notes/ in current directory
+  readme-reader ./my-project           # Serve notes/ inside my-project/
+  readme-reader --port 8080            # Use port 8080
+  readme-reader ./docs --no-open       # Serve docs/notes/ without opening browser
+```
 
 ---
 
-## 🔗 Links and Images
+## How It Works
 
-### Links
-- [Google](https://www.google.com) (Inline Link)
-- [Internal Link to Text Formatting](#-text-formatting) (Anchor Link)
-- Reference link: [My GitHub][my-github-ref]
+`readme-reader` enforces a single rule: **all your Markdown files must live inside a `notes/` folder** in the target directory.
 
-### Images
-**Standard Image:**
-![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
+```
+your-project/
+└── notes/
+    ├── getting-started.md
+    ├── api.md
+    └── guides/
+        ├── setup.md
+        └── deployment.md
+```
 
-**Linked Image:**
-[![Click me!](https://via.placeholder.com/150x50?text=Click+Me)](https://www.google.com)
+When you run `readme-reader`, it will:
 
-[my-github-ref]: https://github.com
-
----
-
-## 🛠 Advanced HTML Components
-
-### Collapsible Section (Details/Summary)
-<details>
-  <summary>👉 Click to expand more technical details!</summary>
-  
-  This content is hidden by default. It can contain:
-  - Lists
-  - `Code blocks`
-  - Even more images!
-  
-  <img src="https://via.placeholder.com/100" alt="Small test image">
-</details>
-
-### Centered Content
-<p align="center">
-  This text is centered using an HTML <code>p</code> tag.
-</p>
+1. Create `notes/` if it doesn't exist, and seed a `welcome.md`
+2. Start an HTTP server on `localhost:3000`
+3. Start a WebSocket server on `localhost:3001` for live reload
+4. Open Chrome (or your default browser) automatically
+5. Watch the `notes/` folder for any changes
 
 ---
 
-## 🧮 Mathematics
+## Keyboard Shortcuts & UI
 
-If your project supports $\LaTeX$ or KaTeX, the following should render as math:
-
-**Inline Math:**
-The Pythagorean theorem is $a^2 + b^2 = c^2$.
-
-**Block Math:**
-$$\int_{a}^{b} x^2 \,dx = \frac{b^3}{3} - \frac{a^3}{3}$$
-
----
-
-## 📝 Footnotes
-
-Here is a sentence that requires a footnote reference[^1]. And another one[^2].
-
-[^1]: This is the first footnote explanation.
-[^2]: This is the second footnote, which can be longer and provide more context about the subject matter.
+| Action | How |
+|---|---|
+| Toggle sidebar | Click the **☰** button (top-left) |
+| Switch theme | Click the **🌙 / ☀️** toggle (top-right) |
+| Export to PDF | Click the **PDF** button (top-right, visible when a file is open) |
+| Close mobile drawer | Tap backdrop or press **Escape** |
+| Navigate between files | Click any file in the sidebar |
+| Jump to a section | Click any heading anchor link in the document |
 
 ---
 
-## 🏁 Final Checklist
-- [x] H1-H6 Headers
-- [x] Bold/Italic/Strike
-- [x] Ordered/Unordered Lists
-- [x] Task Lists
-- [x] Code blocks with highlighting
-- [x] Tables
-- [x] Blockquotes
-- [x] Links & Images
-- [x] HTML `<details>`
-- [x] $\LaTeX$ Math
-- [ ] Footnotes
+## PDF Export
+
+Every note has a **PDF** button in the top bar (visible only when a file is open). Clicking it opens the browser's native print dialog pre-configured for clean PDF output.
+
+**What the PDF includes:**
+- Full rendered Markdown — headings, lists, code blocks, tables, images, footnotes, math
+- Clean white background regardless of the current theme
+- External links have their URL printed after the link text (e.g. `Google (https://google.com)`)
+- Code blocks rendered in a light grey box with monospace font
+- A4 page size with comfortable margins
+
+**How to save as PDF:**
+1. Click the **PDF** button
+2. In the print dialog, set **Destination** → **Save as PDF**
+3. Click **Save**
+
+The sidebar, topbar, and all other UI chrome are automatically hidden in the printed output — only the document content is exported.
+
+---
+
+## Markdown Support
+
+readme-reader uses [markdown-it](https://github.com/markdown-it/markdown-it) with the following extensions:
+
+| Feature | Syntax |
+|---|---|
+| Headings with anchor IDs | `## My Section` → linkable as `#my-section` |
+| Task lists | `- [ ] todo` / `- [x] done` |
+| Footnotes | `word[^1]` … `[^1]: definition` |
+| Inline math | `$E = mc^2$` |
+| Block math | `$$\int_0^\infty$$` |
+| Tables | Standard GFM pipe tables |
+| Strikethrough | `~~deleted~~` |
+| HTML passthrough | Raw HTML inside `.md` files is rendered |
+| Syntax highlighting | Fenced code blocks with language hint |
+
+---
+
+## Publishing to npm
+
+### 1 — Update `package.json`
+
+Open `package.json` and fill in your details:
+
+```json
+{
+  "name": "readme-reader",
+  "version": "1.0.0",
+  "author": "Your Name <you@example.com>",
+  "homepage": "https://github.com/yourusername/readme-reader",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/readme-reader.git"
+  }
+}
+```
+
+> **Name uniqueness** — run `npm search readme-reader` first. If the name is taken, pick something like `@yourusername/readme-reader` (a scoped package).
+
+### 2 — Create an npm account
+
+```bash
+npm adduser
+# or log in if you already have one
+npm login
+```
+
+### 3 — Dry-run to verify what gets published
+
+```bash
+npm pack --dry-run
+```
+
+You should see only the files listed in the `files` field of `package.json`:
+
+```
+bin/readme-reader.js
+README.md
+LICENSE
+package.json
+```
+
+### 4 — Publish
+
+```bash
+# First-time public publish
+npm publish --access public
+
+# For a scoped package (@yourusername/readme-reader)
+npm publish --access public
+```
+
+### 5 — Update a published version
+
+Edit `version` in `package.json` following [semver](https://semver.org/), then:
+
+```bash
+npm version patch   # 1.0.0 → 1.0.1  (bug fix)
+npm version minor   # 1.0.1 → 1.1.0  (new feature)
+npm version major   # 1.1.0 → 2.0.0  (breaking change)
+npm publish
+```
+
+---
+
+## Project Structure
+
+```
+readme-reader/
+├── bin/
+│   └── readme-reader.js      # CLI entry point (the entire server)
+├── package.json       # Package metadata & dependencies
+├── README.md          # This file
+└── LICENSE            # MIT
+```
+
+---
+
+## Dependencies
+
+| Package | Purpose |
+|---|---|
+| `markdown-it` | Core Markdown renderer (GFM, HTML, linkify) |
+| `markdown-it-footnote` | Footnote syntax support |
+| `markdown-it-task-lists` | `- [ ]` checkbox rendering |
+| `ws` | WebSocket server for live reload |
+
+CDN-loaded at runtime (no local install needed):
+
+| Library | Purpose |
+|---|---|
+| highlight.js | Syntax highlighting |
+| KaTeX | Math rendering |
+| Google Fonts | Inter, Lora, JetBrains Mono |
+
+---
+
+## Requirements
+
+- **Node.js** 16 or higher
+- **npm** 7 or higher
+- An internet connection on first load (for CDN fonts/highlight.js/KaTeX)
+
+---
+
+## License
+
+MIT © Your Name
+
+---
+
+## Quick Start
+
+### Use without installing (recommended for one-off use)
+
+```bash
+npx readme-reader
+```
+
+### Install globally
+
+```bash
+npm install -g readme-reader
+readme-reader
+```
+
+### Install locally in a project
+
+```bash
+npm install --save-dev readme-reader
+npx readme-reader
+```
+
+---
+
+## Usage
+
+```
+readme-reader [directory] [options]
+
+Options:
+  --port <n>    HTTP port to listen on  (default: 3000)
+  --no-open     Don't auto-open the browser
+  --help, -h    Show this help message
+
+Examples:
+  readme-reader                        # Serve notes/ in current directory
+  readme-reader ./my-project           # Serve notes/ inside my-project/
+  readme-reader --port 8080            # Use port 8080
+  readme-reader ./docs --no-open       # Serve docs/notes/ without opening browser
+```
+
+---
+
+## How It Works
+
+`readme-reader` enforces a single rule: **all your Markdown files must live inside a `notes/` folder** in the target directory.
+
+```
+your-project/
+└── notes/
+    ├── getting-started.md
+    ├── api.md
+    └── guides/
+        ├── setup.md
+        └── deployment.md
+```
+
+When you run `readme-reader`, it will:
+
+1. Create `notes/` if it doesn't exist, and seed a `welcome.md`
+2. Start an HTTP server on `localhost:3000`
+3. Start a WebSocket server on `localhost:3001` for live reload
+4. Open Chrome (or your default browser) automatically
+5. Watch the `notes/` folder for any changes
+
+---
+
+## Keyboard Shortcuts & UI
+
+| Action | How |
+|---|---|
+| Toggle sidebar | Click the **☰** button (top-left) |
+| Switch theme | Click the **🌙 / ☀️** toggle (top-right) |
+| Close mobile drawer | Tap backdrop or press **Escape** |
+| Navigate between files | Click any file in the sidebar |
+| Jump to a section | Click any heading anchor link in the document |
+
+---
+
+## Markdown Support
+
+readme-reader uses [markdown-it](https://github.com/markdown-it/markdown-it) with the following extensions:
+
+| Feature | Syntax |
+|---|---|
+| Headings with anchor IDs | `## My Section` → linkable as `#my-section` |
+| Task lists | `- [ ] todo` / `- [x] done` |
+| Footnotes | `word[^1]` … `[^1]: definition` |
+| Inline math | `$E = mc^2$` |
+| Block math | `$$\int_0^\infty$$` |
+| Tables | Standard GFM pipe tables |
+| Strikethrough | `~~deleted~~` |
+| HTML passthrough | Raw HTML inside `.md` files is rendered |
+| Syntax highlighting | Fenced code blocks with language hint |
+
+---
+
+## Publishing to npm
+
+### 1 — Update `package.json`
+
+Open `package.json` and fill in your details:
+
+```json
+{
+  "name": "readme-reader",
+  "version": "1.0.0",
+  "author": "Your Name <you@example.com>",
+  "homepage": "https://github.com/yourusername/readme-reader",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/readme-reader.git"
+  }
+}
+```
+
+> **Name uniqueness** — run `npm search readme-reader` first. If the name is taken, pick something like `@yourusername/readme-reader` (a scoped package).
+
+### 2 — Create an npm account
+
+```bash
+npm adduser
+# or log in if you already have one
+npm login
+```
+
+### 3 — Dry-run to verify what gets published
+
+```bash
+npm pack --dry-run
+```
+
+You should see only the files listed in the `files` field of `package.json`:
+
+```
+bin/readme-reader.js
+README.md
+LICENSE
+package.json
+```
+
+### 4 — Publish
+
+```bash
+# First-time public publish
+npm publish --access public
+
+# For a scoped package (@yourusername/readme-reader)
+npm publish --access public
+```
+
+### 5 — Update a published version
+
+Edit `version` in `package.json` following [semver](https://semver.org/), then:
+
+```bash
+npm version patch   # 1.0.0 → 1.0.1  (bug fix)
+npm version minor   # 1.0.1 → 1.1.0  (new feature)
+npm version major   # 1.1.0 → 2.0.0  (breaking change)
+npm publish
+```
+
+---
+
+## Project Structure
+
+```
+readme-reader/
+├── bin/
+│   └── readme-reader.js      # CLI entry point (the entire server)
+├── package.json       # Package metadata & dependencies
+├── README.md          # This file
+└── LICENSE            # MIT
+```
+
+---
+
+## Dependencies
+
+| Package | Purpose |
+|---|---|
+| `markdown-it` | Core Markdown renderer (GFM, HTML, linkify) |
+| `markdown-it-footnote` | Footnote syntax support |
+| `markdown-it-task-lists` | `- [ ]` checkbox rendering |
+| `ws` | WebSocket server for live reload |
+
+CDN-loaded at runtime (no local install needed):
+
+| Library | Purpose |
+|---|---|
+| highlight.js | Syntax highlighting |
+| KaTeX | Math rendering |
+| Google Fonts | Inter, Lora, JetBrains Mono |
+
+---
+
+## Requirements
+
+- **Node.js** 20 or higher
+- **npm** 9 or higher
+- An internet connection on first load (for CDN fonts/highlight.js/KaTeX)
+
+---
+
+## License
+
+MIT © Naman Sharma

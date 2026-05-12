@@ -403,7 +403,14 @@ body.sb-collapsed .content-shell { margin-left:0; }
 .md pre code { background:none; color:inherit; padding:0; font-size:.84em; border-radius:0; }
 .md .task-list-item { list-style:none; }
 .md .task-list-item input[type="checkbox"] { margin-right:6px; accent-color:var(--accent); }
+/* markdown-it-footnote renders its own <hr class="footnotes-sep"> above the
+   footnotes block. We hide it here so only the CSS border-top below is shown,
+   preventing the double-line that appears otherwise. */
+.md .footnotes-sep { display:none; }
 .md .footnotes { margin-top:2.5em; padding-top:1em; border-top:1px solid var(--border); font-size:.86rem; color:var(--text-dim); }
+/* Back-reference arrows (↩) in footnote items */
+.md .footnotes a[href^="#fnref"] { color:var(--text-dim); text-decoration:none; margin-left:4px; }
+.md .footnotes a[href^="#fnref"]:hover { color:var(--accent); }
 
 /* ═══ WELCOME / DELETED ══════════════════════════════════════ */
 .welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:62vh; gap:14px; text-align:center; padding:20px; }
@@ -424,6 +431,108 @@ body.sb-collapsed .content-shell { margin-left:0; }
 
 @media(max-width:768px){ .content-shell{padding:36px 18px 90px} }
 @media(max-width:480px){ .content-shell{padding:26px 14px 72px} }
+
+/* ═══ PDF EXPORT BUTTON ══════════════════════════════════════ */
+.btn-pdf {
+  flex-shrink:0; display:flex; align-items:center; gap:5px;
+  padding:5px 11px; height:28px; border-radius:7px;
+  border:1px solid var(--border); background:var(--surface2);
+  color:var(--text-dim); font-size:.72rem; font-weight:500;
+  cursor:pointer; white-space:nowrap; font-family:'Inter',sans-serif;
+  transition:background .15s,color .15s,border-color .15s,box-shadow .15s;
+}
+.btn-pdf:hover {
+  background:var(--hover); color:var(--text);
+  border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow,rgba(88,166,255,.15));
+}
+.btn-pdf .pdf-icon { width:13px; height:13px; flex-shrink:0; }
+.btn-pdf.pdf-hidden { display:none !important; }
+@media(max-width:520px){ .btn-pdf .pdf-label { display:none; } }
+
+/* ═══ PRINT / PDF ════════════════════════════════════════════
+   Triggered by window.print() — works with browser "Save as PDF".
+   Goal: clean A4-like layout, white bg, black text, no UI chrome.
+══════════════════════════════════════════════════════════════ */
+@media print {
+  /* ── Hide all UI chrome ── */
+  .topbar,
+  .sidebar,
+  .sb-backdrop,
+  .btn-pdf             { display:none !important; }
+
+  /* ── Reset layout ── */
+  html, body           { background:#fff !important; color:#111 !important; }
+  .layout              { padding-top:0 !important; display:block !important; }
+  .content-shell       { margin-left:0 !important; padding:0 !important; display:block !important; }
+  .md-wrap             { max-width:100% !important; }
+
+  /* ── Force light colours on everything ── */
+  *, *::before, *::after {
+    background:transparent !important;
+    color:#111 !important;
+    box-shadow:none !important;
+    text-shadow:none !important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  /* ── Headings ── */
+  .md h1 { font-size:24pt !important; border-bottom:1.5pt solid #ccc !important; }
+  .md h2 { font-size:18pt !important; border-bottom:1pt solid #ddd !important; }
+  .md h3 { font-size:14pt !important; }
+  .md h1,.md h2,.md h3,.md h4,.md h5,.md h6 { color:#000 !important; page-break-after:avoid; }
+
+  /* ── Body text ── */
+  .md p, .md li { font-size:11pt !important; line-height:1.65 !important; color:#222 !important; }
+  .md a  { color:#0550ae !important; }
+  /* Show full URL after external links */
+  .md a[href^="http"]::after {
+    content:" (" attr(href) ")";
+    font-size:8pt; color:#555 !important;
+  }
+
+  /* ── Code ── */
+  .md code {
+    background:#f4f4f4 !important; color:#c0390a !important;
+    border:0.5pt solid #ccc !important; border-radius:3pt !important;
+  }
+  .md pre {
+    background:#f8f8f8 !important; border:0.75pt solid #ccc !important;
+    border-radius:4pt !important; padding:10pt 14pt !important;
+    overflow:visible !important; white-space:pre-wrap !important;
+    page-break-inside:avoid;
+  }
+  .md pre code { background:transparent !important; border:none !important; color:#333 !important; }
+
+  /* ── Tables ── */
+  .md table { display:table !important; width:100% !important; border-collapse:collapse !important; }
+  .md th { background:#eef0f3 !important; color:#000 !important; border:0.75pt solid #bbb !important; font-size:10pt !important; }
+  .md td { border:0.75pt solid #ccc !important; font-size:10pt !important; }
+  .md tr:nth-child(even) td { background:#f9f9f9 !important; }
+
+  /* ── Blockquotes ── */
+  .md blockquote {
+    border-left:3pt solid #999 !important;
+    background:#f7f7f7 !important;
+    color:#555 !important;
+  }
+
+  /* ── Task checkboxes ── */
+  .md .task-list-item input[type="checkbox"] { accent-color:#000 !important; }
+
+  /* ── Footnotes ── */
+  .md .footnotes { border-top:0.75pt solid #ccc !important; color:#555 !important; }
+  .md .footnotes-sep { display:none !important; }
+
+  /* ── Images — keep them within page width ── */
+  .md img { max-width:100% !important; page-break-inside:avoid; }
+
+  /* ── Page break hints ── */
+  pre, blockquote, table, figure { page-break-inside:avoid; }
+
+  /* ── Page size and margins ── */
+  @page { size:A4; margin:2cm 2.2cm 2.5cm; }
+}
 </style>
 </head>
 <body>
@@ -441,6 +550,16 @@ body.sb-collapsed .content-shell { margin-left:0; }
     <span class="theme-icon">🌙</span>
     <span class="theme-icon">☀️</span>
     <div class="theme-knob"></div>
+  </button>
+  <!-- PDF export — only shown when a file is open -->
+  <button class="btn-pdf pdf-hidden" id="btnPdf" title="Export as PDF">
+    <svg class="pdf-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5L9 1z"/>
+      <path d="M9 1v4h4"/>
+      <path d="M5.5 9.5h2c.6 0 1 .4 1 1s-.4 1-1 1H5.5V8.5h1.5c.5 0 .9.3.9.8s-.4.7-.9.7"/>
+      <path d="M10 8.5v4M10 8.5h1.2c.7 0 1.3.6 1.3 1.3v1.4c0 .7-.6 1.3-1.3 1.3H10"/>
+    </svg>
+    <span class="pdf-label">PDF</span>
   </button>
   <div class="live-badge">
     <div class="live-dot" id="liveDot"></div>
@@ -477,6 +596,19 @@ applyTheme(localStorage.getItem('readme-reader-theme') || 'dark');
 document.getElementById('btnTheme').addEventListener('click', () =>
   applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')
 );
+
+/* ── PDF EXPORT ─────────────────────────────────────────── */
+// Show the PDF button only when a real file is being viewed
+function setPdfBtn(visible) {
+  document.getElementById('btnPdf').classList.toggle('pdf-hidden', !visible);
+}
+// Initialise based on current URL (non-root path = file is open)
+setPdfBtn(location.pathname.length > 1);
+
+document.getElementById('btnPdf').addEventListener('click', () => {
+  // Small delay so any pending KaTeX / highlight renders finish first
+  setTimeout(() => window.print(), 80);
+});
 
 /* ── SIDEBAR ────────────────────────────────────────────── */
 const isMobile = () => window.innerWidth <= 768;
@@ -567,6 +699,7 @@ async function navigate(url) {
     document.getElementById('topbarPath').textContent = fp || 'notes/';
     history.pushState({}, '', u.pathname + u.search);
     markActive(fp);
+    setPdfBtn(!!fp);  // show PDF button only when a file is open
     if (u.hash) setTimeout(() => scrollToHash(u.hash), 60);
     else window.scrollTo({ top:0, behavior:'smooth' });
   } catch(e) { console.error('Navigate error:', e); }
