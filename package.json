@@ -1,6 +1,6 @@
 {
   "name": "readme-reader",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A zero-config local Markdown viewer with live reload, dark/light mode, collapsible sidebar, and anchor-link navigation.",
   "keywords": [
     "markdown",
